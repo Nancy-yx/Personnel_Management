@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.personnel.mapper.SalaryMapper">
+
+    <!-- 分页查询薪资（带员工姓名工号） -->
+    <select id="selectSalaryPage" resultType="com.personnel.entity.Salary">
+        SELECT s.*, e.name as employee_name, e.employee_no as employee_no
+        FROM salary_record s
+        LEFT JOIN sys_employee e ON s.employee_id = e.id
+        WHERE s.deleted = 0
+        <if test="query.employeeId != null">
+            AND s.employee_id = #{query.employeeId}
+        </if>
+        <if test="query.month != null and query.month != ''">
+            AND s.month = #{query.month}
+        </if>
+        <if test="query.status != null">
+            AND s.status = #{query.status}
+        </if>
+        ORDER BY s.month DESC, s.create_time DESC
+    </select>
+
+    <!-- 按月份汇总薪资总额 -->
+    <select id="selectTotalByMonth" resultType="java.util.Map">
+        SELECT
+            COALESCE(SUM(net_salary), 0) as totalSalary,
+            COALESCE(SUM(gross_salary), 0) as grossTotal,
+            COUNT(1) as count
+        FROM salary_record
+        WHERE deleted = 0
+        AND month = #{month}
+    </select>
+
+    <!-- 查询最近几个月的薪资汇总 -->
+    <select id="selectSalaryTrend" resultType="java.util.Map">
+        SELECT
+            month,
+            COALESCE(SUM(net_salary), 0) as totalSalary
+        FROM salary_record
+        WHERE deleted = 0
+        AND month &gt;= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL #{months} MONTH), '%Y-%m')
+        GROUP BY month
+        ORDER BY month ASC
+    </select>
+
+    <!-- 按部门统计薪资 -->
+    <select id="selectSalaryByDepartment" resultType="java.util.Map">
+        SELECT
+            COALESCE(d.name, '未分配部门') as departmentName,
+            COALESCE(SUM(s.net_salary), 0) as totalSalary
+        FROM salary_record s
+        LEFT JOIN sys_employee e ON s.employee_id = e.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE s.deleted = 0
+        AND s.month = #{month}
+        GROUP BY d.id, d.name
+        ORDER BY totalSalary DESC
+    </select>
+
+</mapper>

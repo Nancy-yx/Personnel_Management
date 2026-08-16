@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.personnel.mapper.EmployeeMapper">
+
+    <!-- 分页查询员工（带部门名） -->
+    <select id="selectEmployeePage" resultType="com.personnel.entity.Employee">
+        SELECT e.*, d.name as department_name
+        FROM sys_employee e
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE e.deleted = 0
+        <if test="query.name != null and query.name != ''">
+            AND e.name LIKE CONCAT('%', #{query.name}, '%')
+        </if>
+        <if test="query.departmentId != null">
+            AND e.department_id = #{query.departmentId}
+        </if>
+        <if test="query.status != null">
+            AND e.status = #{query.status}
+        </if>
+        <if test="query.position != null and query.position != ''">
+            AND e.position LIKE CONCAT('%', #{query.position}, '%')
+        </if>
+        ORDER BY e.create_time DESC
+    </select>
+
+    <!-- 按部门查询员工 -->
+    <select id="selectByDepartmentId" resultType="com.personnel.entity.Employee">
+        SELECT e.*, d.name as department_name
+        FROM sys_employee e
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE e.deleted = 0
+        AND e.department_id = #{departmentId}
+        ORDER BY e.employee_no ASC
+    </select>
+
+</mapper>

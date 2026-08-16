@@ -1,0 +1,40 @@
+# Java SpringBoot后端
+target/
+*.jar
+*.war
+*.log
+*.iml
+.idea/
+*.class
+
+# Vue前端
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.eslintcache
+
+# vscode编辑器
+.vscode/
+*.tmp
+*.temp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 环境配置（含密码的本地配置不要上传）
+*.yml.local
+*.properties.local
+application-local.yml
+application-local.properties
+# 含真实数据库密码的配置文件不上传，使用 application.yml.example 作为模板
+backend/src/main/resources/application.yml
+
+# 日志文件
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
